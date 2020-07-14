@@ -1,5 +1,11 @@
 import { IFetchOptions, IHttpClientImpl } from "@pnp/common";
-import { IResponsePayload, IRequestPayload } from "./types";
+import {
+  IResponsePayload,
+  IRequestPayload,
+  ProxyReadyName,
+  ResponseTypeName,
+  RequestTypeName,
+} from "./types";
 
 export interface IProxyClientOptions {
   proxyPageUrl: string;
@@ -21,7 +27,7 @@ export class ProxyClient implements IHttpClientImpl {
       frame.style.display = "none";
 
       const onProxyReady = (event: MessageEvent) => {
-        if (event.data === "SP_PROXY_READY") {
+        if (event.data === ProxyReadyName) {
           window.removeEventListener("message", onProxyReady);
           this.proxy = frame.contentWindow;
           resolve();
@@ -37,7 +43,7 @@ export class ProxyClient implements IHttpClientImpl {
           const data: IResponsePayload = event.data;
 
           if (
-            data.type !== "SP_PROXY_RESPONSE" ||
+            data.type !== ResponseTypeName ||
             !data.id ||
             !data.response ||
             !Object.prototype.hasOwnProperty.call(this.listeners, data.id)
@@ -83,7 +89,7 @@ export class ProxyClient implements IHttpClientImpl {
 
       const request: IRequestPayload = {
         id,
-        type: "SP_PROXY_REQUEST",
+        type: RequestTypeName,
         request: {
           url,
           options: {
